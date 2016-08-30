@@ -13,49 +13,31 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
   process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 var secret = JSON.parse(fs.readFileSync('client_secret.json', 'utf-8'));
-var schedule = fs.readFileSync('schedule.txt', 'utf-8');
-var sched_arr = schedule.split('\n');
 
-sched_arr = sched_arr.filter(function(v) {
-  return v !== "";
-});
 
-var events = con2goog(parseRawSchedule(sched_arr));
-authorize(secret, function(auth){
- createCalendar(auth, "Concordia Schedule", function(err, response){
-   if (err) {
-     console.log(err);
-     return;
-   }
-   _.forEach(events, function(event) {
-     createEvent(auth, response.id, event, function(err, resp){
-       if (err) {
-         console.log(err);
-         return;
-       }
+exports.createCalendar = function(auth, schedule) {
+  var sched_arr = schedule.split('\n').filter(function(v) {
+    return v !== "";
+  });
+  var events = con2goog(parseRawSchedule(sched_arr));
+
+   createCalendar(auth, "Concordia Schedule", function(err, response){
+     if (err) {
+       console.log(err);
+       return;
+     }
+     _.forEach(events, function(event) {
+       createEvent(auth, response.id, event, function(err, resp){
+         if (err) {
+           console.log(err);
+           return;
+         }
+       });
      });
    });
- });
-});
+};
 
 
-// authorize(secret, function(auth){
-//   listCalendars(auth, function(err, response){
-//     if (err) {
-//       console.log(err);
-//       return;
-//     }
-//     var calendars = response.items.filter(function(cal){ return cal.summary === "Concordia Schedule" });
-//     _.forEach(calendars, function(cal){
-//       console.log(cal.id);
-//       deleteCalendar(auth, cal.id, function(err, resp){
-//         if (err)
-//           console.log(err);
-//         console.log(resp);
-//       });
-//     });
-//   });
-// });
 
 function parseRawSchedule(sched_arr) {
   var schedule = [];
