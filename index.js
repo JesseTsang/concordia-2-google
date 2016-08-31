@@ -16,7 +16,7 @@ var bodyParser = require('body-parser')
 
 var clientSecret = "_l3Ic6ogSDeJnNS5z5szpDts";
 var clientId = "301399655599-2rsognkd7fupttdl2gncn2uqdhpo1g5s.apps.googleusercontent.com";
-var redirectUrl = "http://localhost:3000/cb";
+var redirectUrl = "https://concordia2google.herokuapp.com/cb";
 var auth = new googleAuth();
 var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 var authUrl = oauth2Client.generateAuthUrl({
@@ -73,6 +73,6 @@ app.post('/deletecalendar', function(req, res) {
 });
 
 
-app.listen(3000, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log('Example app listening on port 3000!');
 });
