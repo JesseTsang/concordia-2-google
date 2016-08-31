@@ -32,26 +32,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', function (req, res) {
   res.render('pages/index', {
     authUrl: authUrl,
-    result: ''
+    delete_button: req.param('delete_button'),
+    code: '',
+    access_token: req.param('token') || ''
   });
 });
 
 app.get('/cb', function (req, res) {
   res.render('pages/index', {
     authUrl: authUrl,
-    result: req.query.code
+    code: req.query.code,
+    delete_button: false,
+    access_token: ''
   });
 });
 
 app.post('/createcalendar', function(req, res) {
-  console.log(req.body.code);
   oauth2Client.getToken(req.body.code, function(err, token) {
     if (err) {
       console.log('Error while trying to retrieve access token', err);
       return res.json({success: false});
     }
+    console.log(token);
     oauth2Client.credentials = token;
-    calendar.createCalendar(oauth2Client, '');
+    calendar.createCalendar(oauth2Client, req.body.calendar, function(err) {
+      if(err)
+        return res.json({success: false});
+      return res.json({success: true, access_token: token.access_token});
+    });
+  });
+});
+
+app.post('/deletecalendar', function(req, res) {
+  oauth2Client.credentials = {access_token: req.body.token};
+  calendar.deleteCalendar(oauth2Client, function(err) {
+    if (err)
+      return res.json({success: false});
     return res.json({success: true});
   });
 });

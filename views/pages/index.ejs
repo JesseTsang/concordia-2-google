@@ -24,31 +24,81 @@
   <div class="container">
     <div class="row col-lg-6">
       <h1> Concordia 2 Google</h1>
-   <a href="<%= authUrl %>" class="btn btn-danger btn-block">Login with Google+</a>
-    <% if (result !== '') {%>
-    <form action="/createcalendar" method="post" id="form">
-      <div class="form-group">
-        <label for="exampleInputEmail1">Calendar data</label>
-        <textarea class="form-control" rows="30" id="calendar" name="test" ></textarea>
-      </div>
-      <button type="submit" class="btn btn-default">Submit</button>
-    <% } %>
-
-  </form>
+      <h2>How to use</h2>
+      <p>
+        <strong>Disclaimer: I'm not responsible if something goes wrong. Proceed at your own risk.</strong>
+      </p>
+      <p>
+        <strong>Follow these steps very carefully:</strong></br>
+        0. All steps are shown if gif below</br>
+        1. Click on <strong>login with Google+</strong></br>
+        2. Go to your weekly schedule on MyConcordia (make sure you're in <strong>list view</strong>)</br>
+        3. Copy your schedule as shown in the gif and paste it in the text area</br>
+        4. Click on <strong>submit</strong></br>
+        5. The app will create a calendar called "Concordia Schedule" in your Google Calendar. It might take couple of moments. Be patient... If nothing happens within 10 seconds, congrats! You managed to break the app.</br>
+        6. A confirmation dialog will popup. You can now check your Google Calendar.</br>
+        7. If something went wrong, click on the delete button (as shown in 2nd gif below).</br>
+        </br>
+      </p>
+      <% if (code === '' && access_token === '') {%>
+      <a href="<%= authUrl %>" class="btn btn-danger btn-block" style="margin-bottom: 10px;">Login with Google+</a>
+      <% } else if (code !== ''){ %>
+      <form action="/calendar" method="post" id="form">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Calendar data</label>
+          <textarea class="form-control" rows="30" id="calendar" name="test" ></textarea>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <% } %>
+      <% if (delete_button) { %>
+      <form action="/remcalendar" method="post" id="delete_form">
+        <button type="submit" class="btn btn-default">Delete 'Concordia Schedule' calendar</button>
+      </form>
+      <% } %>
+      <p>
+        <strong>Creating your calendar</strong>
+        <img src="/img/create.gif" height="500px"/></br>
+      </p>
+      <p>
+        <strong>Removing your calendar (if something goes wrong)</strong>
+        <img src="/img/remove.gif" height="500px"/></br>
+      </p>
   </div>
+
   <script type="text/javascript">
-    var code = '<%= result %>';
     $( "#form" ).submit(function(e) {
+      var code = '<%= code %>';
       e.preventDefault();
       $.ajax({
-        url:'/createcalendar',
+        url: '/createcalendar',
+        type: "POST",
+        data: JSON.stringify({calendar: $('#calendar').val(), code: code}),
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+          alertify
+            .alert('Successfully added your schedule to your Google Calendar', function () {
+              document.location.href = "/?delete_button=true&token=" + result.access_token;
+            });
+        },
+        error: function (err) {
+          console.log(err);
+        }
+      });
+    });
+    $( "#delete_form" ).submit(function(e) {
+      var access_token = '<%= access_token %>';
+      e.preventDefault();
+      $.ajax({
+        url:'/deletecalendar',
         type:"POST",
-        data:JSON.stringify({calendar: $('#calendar').val(), code: code}),
+        data:JSON.stringify({token: access_token}),
         contentType:"application/json",
         dataType:"json",
         success: function(result){
           alertify
-          .alert('Successfully added the Concordia Calendar to your Gmail', function(){
+            .alert('Successfully deleted \'Concordia Schedule\' calendar', function(){
               document.location.href="/";
             });
         },
