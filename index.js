@@ -5,7 +5,14 @@ var google = require('googleapis');
 var googleAuth = require('google-auth-library');
 var path = require('path');
 var calendar = require("./google.js");
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var topSecret = require('./top_secret.json');
+
+var d = require('domain').create();
+d.on('error', function(err){
+  console.log(err);
+  return
+});
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -14,9 +21,9 @@ var bodyParser = require('body-parser')
  * @param {Object} credentials The authorization client credentials.
  */
 
-var clientSecret = "_l3Ic6ogSDeJnNS5z5szpDts";
-var clientId = "301399655599-2rsognkd7fupttdl2gncn2uqdhpo1g5s.apps.googleusercontent.com";
-var redirectUrl = "https://concordia2google.herokuapp.com/cb";
+var clientSecret = process.env.CLIENTSECRET || topSecret.client_secret;
+var clientId = process.env.CLIENTID || topSecret.client_id;
+var redirectUrl = process.env.REDIRECTURL || "http://localhost:3000/cb";
 var auth = new googleAuth();
 var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 var authUrl = oauth2Client.generateAuthUrl({
@@ -48,28 +55,30 @@ app.get('/cb', function (req, res) {
 });
 
 app.post('/createcalendar', function(req, res) {
-  oauth2Client.getToken(req.body.code, function(err, token) {
+  d.run(oauth2Client.getToken(req.body.code, function (err, token) {
     if (err) {
       console.log('Error while trying to retrieve access token', err);
       return res.json({success: false});
     }
-    console.log(token);
+
     oauth2Client.credentials = token;
-    calendar.createCalendar(oauth2Client, req.body.calendar, function(err) {
-      if(err)
+    calendar.createCalendar(oauth2Client, req.body.calendar, function (err) {
+      if (err)
         return res.json({success: false});
       return res.json({success: true, access_token: token.access_token});
     });
-  });
+  }))
 });
 
 app.post('/deletecalendar', function(req, res) {
-  oauth2Client.credentials = {access_token: req.body.token};
-  calendar.deleteCalendar(oauth2Client, function(err) {
-    if (err)
-      return res.json({success: false});
-    return res.json({success: true});
-  });
+  d.run(function () {
+    oauth2Client.credentials = {access_token: req.body.token};
+    calendar.deleteCalendar(oauth2Client, function(err) {
+      if (err)
+        return res.json({success: false});
+      return res.json({success: true});
+    });
+  })
 });
 
 

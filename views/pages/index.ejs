@@ -26,7 +26,7 @@
       <h1> Concordia 2 Google</h1>
       <h2>How to use</h2>
       <p>
-        <strong>Disclaimer: I'm not responsible if something goes wrong. Proceed at your own risk.</strong>
+        <strong>Disclaimer: I'm not responsible if something goes wrong. Proceed at your own risk. The app works for me and if it works for you, GREAT! Otherwise, I really don't care.</strong>
       </p>
       <p>
         <strong>Follow these steps very carefully:</strong></br>
@@ -35,11 +35,15 @@
         2. Go to your weekly schedule on MyConcordia (make sure you're in <strong>list view</strong>)</br>
         3. Copy your schedule as shown in the gif and paste it in the text area</br>
         4. Click on <strong>submit</strong></br>
-        5. The app will create a calendar called "Concordia Schedule" in your Google Calendar. It might take couple of moments. Be patient... If nothing happens within 10 seconds, congrats! You managed to break the app.</br>
+        5. The app will create a calendar called "Concordia Schedule" in your Google Calendar. It might take couple of moments. Be patient... If nothing happens within 10 seconds, well... crap.</br>
         6. A confirmation dialog will popup. You can now check your Google Calendar.</br>
         7. If something went wrong, click on the delete button (as shown in 2nd gif below).</br>
         </br>
       </p>
+      <p><strong>NOTE: Don't click on submit 234489723 times. That might just create 234489723 calendars.</strong></p>
+      <p><strong>NOTE: If one of your courses does not have date and/or time, the app will derp out.</strong></p>
+      <p><strong>NOTE: I understand this is not the best user experience, but IDGAF. CHEERS!</strong></p>
+
       <% if (code === '' && access_token === '') {%>
       <a href="<%= authUrl %>" class="btn btn-danger btn-block" style="margin-bottom: 10px;">Login with Google+</a>
       <% } else if (code !== ''){ %>
@@ -108,5 +112,15 @@
       });
     });
   </script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-83595278-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
 </body>
 </html>

@@ -10,7 +10,7 @@ exports.createCalendar = function (auth, schedule, cb) {
     return v.search(/\s+/) || v === "";
   });
   var events = con2goog(parseRawSchedule(sched_arr));
-
+  console.log(events);
    createCalendar(auth, "Concordia Schedule", function(err, response){
      if (err) {
        console.log(err);
@@ -87,7 +87,7 @@ function parseRawSchedule(sched_arr) {
     }
     schedule.push(course);
   }
-
+  console.log(schedule);
   return schedule;
 }
 
@@ -138,7 +138,7 @@ function con2goog(schedule) {
 
     events.push(event);
   });
-  console.log(events);
+
   return events;
 }
 
